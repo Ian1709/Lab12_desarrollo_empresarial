@@ -1,0 +1,7 @@
+﻿Validación provocada desde el formulario (campo obligatorio 'titulo' vacío)
+
+Petición: POST http://localhost:8000/api/examenes/
+Cuerpo enviado: {"titulo":"","descripcion":"","activo":true}
+Respuesta API: 400 {"titulo":["This field may not be blank."]}
+
+UI: muestra el mensaje "Error de la API: titulo: This field may not be blank." dentro del formulario.

@@ -1,0 +1,10 @@
+﻿CORS provocado (origen autorizado quitado en backend/config/settings.py)
+
+Consola del navegador:
+- Access to XMLHttpRequest at 'http://localhost:8000/api/examenes/' from origin 'http://127.0.0.1:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+- Failed to load resource: net::ERR_FAILED
+
+UI:
+- Muestra el estado de error: "No se pudo conectar con el servidor. Verifica que la API esté en ejecución." con botón "Reintentar".
+
+Luego se volvió a habilitar CORS_ALLOWED_ORIGINS para http://localhost:5173 y http://127.0.0.1:5173.

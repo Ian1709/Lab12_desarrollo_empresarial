@@ -1,0 +1,4 @@
+﻿Servidor Django apagado con la aplicación React abierta
+
+Acción: se detuvo 'python manage.py runserver' y se recargó el listado en el frontend.
+Resultado: la pantalla muestra el estado de error "No se pudo conectar con el servidor. Verifica que la API esté en ejecución." con botón "Reintentar" (no queda en blanco).
