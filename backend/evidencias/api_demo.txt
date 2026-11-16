@@ -1,0 +1,140 @@
+==============================================================================
+PASO 7/8.1  Listar exámenes
+GET http://127.0.0.1:8000/api/examenes/
+-> HTTP 200
+{"count":2,"next":null,"previous":null,"results":[{"id":13,"titulo":"Fundamentos de Python","descripcion":"Cuestionario de introducción al lenguaje Python.","activo":true,"fecha_creacion":"2026-10-17T08:39:00.092690Z","question_count":7},{"id":14,"titulo":"Bases de datos","descripcion":"Cuestionario sobre SQL y modelado relacional.","activo":true,"fecha_creacion":"2026-10-17T08:39:00.093444Z","question_count":3}]}
+
+==============================================================================
+PASO 7/8.2  Crear examen
+POST http://127.0.0.1:8000/api/examenes/
+-> HTTP 201
+{"id":15,"titulo":"Cuestionario de prueba","descripcion":"Creado desde el cliente HTTP externo.","activo":true,"fecha_creacion":"2026-10-17T09:59:54.759357Z"}
+
+==============================================================================
+PASO 7/8.3  Detalle del examen
+GET http://127.0.0.1:8000/api/examenes/15/
+-> HTTP 200
+{"id":15,"titulo":"Cuestionario de prueba","descripcion":"Creado desde el cliente HTTP externo.","activo":true,"fecha_creacion":"2026-10-17T09:59:54.759357Z","question_count":0}
+
+==============================================================================
+PASO 7/8.4  Modificar examen (PUT)
+PUT http://127.0.0.1:8000/api/examenes/15/
+-> HTTP 200
+{"id":15,"titulo":"Cuestionario de prueba (PUT)","descripcion":"Reemplazo completo vía PUT.","activo":false,"fecha_creacion":"2026-10-17T09:59:54.759357Z","question_count":0}
+
+==============================================================================
+PASO 7/8.5  Modificar parcialmente el examen (PATCH)
+PATCH http://127.0.0.1:8000/api/examenes/15/
+-> HTTP 200
+{"id":15,"titulo":"Cuestionario de prueba (PUT)","descripcion":"Reemplazo completo vía PUT.","activo":true,"fecha_creacion":"2026-10-17T09:59:54.759357Z","question_count":0}
+
+==============================================================================
+PASO 7/8.6  Crear pregunta con opciones anidadas
+POST http://127.0.0.1:8000/api/preguntas/
+-> HTTP 201
+{"id":71,"examen":15,"enunciado":"¿Cuál es la capital de Francia?","orden":1,"opciones":[{"id":281,"texto":"París","es_correcta":true},{"id":282,"texto":"Madrid","es_correcta":false},{"id":283,"texto":"Roma","es_correcta":false}]}
+
+==============================================================================
+PASO 7/8.7  Detalle de la pregunta
+GET http://127.0.0.1:8000/api/preguntas/71/
+-> HTTP 200
+{"id":71,"examen":15,"enunciado":"¿Cuál es la capital de Francia?","orden":1,"opciones":[{"id":281,"texto":"París","es_correcta":true},{"id":282,"texto":"Madrid","es_correcta":false},{"id":283,"texto":"Roma","es_correcta":false}]}
+
+==============================================================================
+PASO 7/8.8  Modificar parcialmente la pregunta (PATCH)
+PATCH http://127.0.0.1:8000/api/preguntas/71/
+-> HTTP 200
+{"id":71,"examen":15,"enunciado":"¿Cuál es la capital de Francia?","orden":2,"opciones":[{"id":281,"texto":"París","es_correcta":true},{"id":282,"texto":"Madrid","es_correcta":false},{"id":283,"texto":"Roma","es_correcta":false}]}
+
+==============================================================================
+PASO 7/8.9  Modificar la pregunta (PUT)
+PUT http://127.0.0.1:8000/api/preguntas/71/
+-> HTTP 200
+{"id":71,"examen":15,"enunciado":"¿Cuál es la capital de Francia? (actualizado)","orden":2,"opciones":[{"id":284,"texto":"París","es_correcta":true},{"id":285,"texto":"Lyon","es_correcta":false}]}
+
+==============================================================================
+PASO 7/8.10  Crear opción
+POST http://127.0.0.1:8000/api/opciones/
+-> HTTP 201
+{"id":286,"pregunta":71,"texto":"Marsella","es_correcta":false}
+
+==============================================================================
+PASO 7/8.11  Modificar parcialmente la opción (PATCH)
+PATCH http://127.0.0.1:8000/api/opciones/286/
+-> HTTP 200
+{"id":286,"pregunta":71,"texto":"Niza","es_correcta":false}
+
+==============================================================================
+PASO 7/8.12  Eliminar opción
+DELETE http://127.0.0.1:8000/api/opciones/286/
+-> HTTP 204
+
+==============================================================================
+PASO 7/8.13  Eliminar pregunta
+DELETE http://127.0.0.1:8000/api/preguntas/71/
+-> HTTP 204
+
+==============================================================================
+PASO 7/8.14  Eliminar examen
+DELETE http://127.0.0.1:8000/api/examenes/15/
+-> HTTP 204
+
+##############################################################################
+PASO 9.  ERRORES PROVOCADOS A PROPÓSITO
+##############################################################################
+==============================================================================
+ERROR 1  Campo obligatorio ausente (falta "enunciado")
+POST http://127.0.0.1:8000/api/preguntas/
+-> HTTP 400
+{"enunciado":["This field is required."]}
+
+==============================================================================
+ERROR 2  Tipo incorrecto ("examen" y "orden")
+POST http://127.0.0.1:8000/api/preguntas/
+-> HTTP 400
+{"examen":["Incorrect type. Expected pk value, received str."],"orden":["A valid integer is required."]}
+
+==============================================================================
+ERROR 3a  Ninguna opción correcta
+POST http://127.0.0.1:8000/api/preguntas/
+-> HTTP 400
+{"opciones":["La pregunta debe tener exactamente una opción correcta (se recibieron 0)."]}
+
+==============================================================================
+ERROR 3b  Dos opciones correctas
+POST http://127.0.0.1:8000/api/preguntas/
+-> HTTP 400
+{"opciones":["La pregunta debe tener exactamente una opción correcta (se recibieron 2)."]}
+
+##############################################################################
+PASO 10.  FILTRADO, BÚSQUEDA Y PAGINACIÓN
+##############################################################################
+==============================================================================
+Filtrado por examen (?examen=13) — count=7
+GET http://127.0.0.1:8000/api/preguntas/?examen=13
+-> HTTP 200
+{"count":7,"next":"http://127.0.0.1:8000/api/preguntas/?examen=13&page=2","previous":null,"results":[{"id":61,"examen":13,"enunciado":"¿Qué tipo de dato es el resultado de 3 / 2 en Python 3?","orden":1,"opciones":[{"id":241,"texto":"float","es_correcta":true},{"id":242,"texto":"int","es_correcta":false},{"id":243,"texto":"str","es_correcta":false},{"id":244,"texto":"bool","es_correcta":false}]},{"id":62,"examen":13,"enunciado":"¿Qué palabra clave define una función?","orden":2,"opciones":[{"id":245,"texto":"def","es_correcta":true},{"id":246,"texto":"func","es_correcta":false},{"id":247,"texto":"lambda","es_correcta":false},{"id":248,"texto":"function","es_correcta":false}]},{"id":63,"examen":13,"enunciado":"¿Qué estructura es inmutable?","orden":3,"opciones":[{"id":249,"texto":"tuple","es_correcta":true},{"id":250,"texto":"list","es_correcta":false},{"id":251,"texto":"dict","es_correcta
+
+==============================================================================
+Búsqueda por enunciado (?search=Python) — count=1
+GET http://127.0.0.1:8000/api/preguntas/?search=Python
+-> HTTP 200
+{"count":1,"next":null,"previous":null,"results":[{"id":61,"examen":13,"enunciado":"¿Qué tipo de dato es el resultado de 3 / 2 en Python 3?","orden":1,"opciones":[{"id":241,"texto":"float","es_correcta":true},{"id":242,"texto":"int","es_correcta":false},{"id":243,"texto":"str","es_correcta":false},{"id":244,"texto":"bool","es_correcta":false}]}]}
+
+==============================================================================
+Paginación página 1 — count=10 results=5 next=http://127.0.0.1:8000/api/preguntas/?page=2
+GET http://127.0.0.1:8000/api/preguntas/
+-> HTTP 200
+{"count":10,"next":"http://127.0.0.1:8000/api/preguntas/?page=2","previous":null,"results":[{"id":61,"examen":13,"enunciado":"¿Qué tipo de dato es el resultado de 3 / 2 en Python 3?","orden":1,"opciones":[{"id":241,"texto":"float","es_correcta":true},{"id":242,"texto":"int","es_correcta":false},{"id":243,"texto":"str","es_correcta":false},{"id":244,"texto":"bool","es_correcta":false}]},{"id":62,"examen":13,"enunciado":"¿Qué palabra clave define una función?","orden":2,"opciones":[{"id":245,"texto":"def","es_correcta":true},{"id":246,"texto":"func","es_correcta":false},{"id":247,"texto":"lambda","es_correcta":false},{"id":248,"texto":"function","es_correcta":false}]},{"id":63,"examen":13,"enunciado":"¿Qué estructura es inmutable?","orden":3,"opciones":[{"id":249,"texto":"tuple","es_correcta":true},{"id":250,"texto":"list","es_correcta":false},{"id":251,"texto":"dict","es_correcta":false},
+
+==============================================================================
+Paginación página 2 — count=10 results=5 previous=http://127.0.0.1:8000/api/preguntas/
+GET http://127.0.0.1:8000/api/preguntas/?page=2
+-> HTTP 200
+{"count":10,"next":null,"previous":"http://127.0.0.1:8000/api/preguntas/","results":[{"id":66,"examen":13,"enunciado":"¿Qué método añade al final de una lista?","orden":6,"opciones":[{"id":261,"texto":"append","es_correcta":true},{"id":262,"texto":"push","es_correcta":false},{"id":263,"texto":"add","es_correcta":false},{"id":264,"texto":"insert","es_correcta":false}]},{"id":67,"examen":13,"enunciado":"¿Qué símbolo inicia un comentario?","orden":7,"opciones":[{"id":265,"texto":"#","es_correcta":true},{"id":266,"texto":"//","es_correcta":false},{"id":267,"texto":"--","es_correcta":false},{"id":268,"texto":"/*","es_correcta":false}]},{"id":68,"examen":14,"enunciado":"¿Qué sentencia recupera filas?","orden":1,"opciones":[{"id":269,"texto":"SELECT","es_correcta":true},{"id":270,"texto":"GET","es_correcta":false},{"id":271,"texto":"FETCH","es_correcta":false},{"id":272,"texto":"READ","es_corre
+
+==============================================================================
+Filtrado + paginación (?examen=13&page=2) — count=7 results=2
+GET http://127.0.0.1:8000/api/preguntas/?examen=13&page=2
+-> HTTP 200
+{"count":7,"next":null,"previous":"http://127.0.0.1:8000/api/preguntas/?examen=13","results":[{"id":66,"examen":13,"enunciado":"¿Qué método añade al final de una lista?","orden":6,"opciones":[{"id":261,"texto":"append","es_correcta":true},{"id":262,"texto":"push","es_correcta":false},{"id":263,"texto":"add","es_correcta":false},{"id":264,"texto":"insert","es_correcta":false}]},{"id":67,"examen":13,"enunciado":"¿Qué símbolo inicia un comentario?","orden":7,"opciones":[{"id":265,"texto":"#","es_correcta":true},{"id":266,"texto":"//","es_correcta":false},{"id":267,"texto":"--","es_correcta":false},{"id":268,"texto":"/*","es_correcta":false}]}]}
